@@ -1,0 +1,451 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <title>iPad Dashboard</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root{
+      --cream: #fdf3e8;
+      --frame: #f6ddc4;
+      --card: #ffffff;
+      --teal: #1f7a72;
+      --teal-dark: #16564f;
+      --pink: #ec6f91;
+      --amber: #f5a623;
+      --amber-dark: #e0900f;
+      --mint-bg: #e6f6f1;
+      --mint-text: #1f8f76;
+      --blush-bg: #fdeaf0;
+      --blush-text: #e0577e;
+      --ink: #4a4a4a;
+      --muted: #9a9a9a;
+      --line: #f3e2d1;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'PingFang HK', 'Helvetica Neue', sans-serif; -webkit-text-size-adjust: 100%; }
+    .num { font-family: 'Baloo 2', 'PingFang HK', sans-serif; }
+    html, body { height: 100%; }
+    body {
+      background: var(--cream);
+      color: var(--ink);
+      font-weight: 500;
+      padding: clamp(10px, 1.6vw, 22px);
+      min-height: 100dvh;
+      display: flex;
+      flex-direction: column;
+      overflow-x: hidden;
+    }
+
+    .frame {
+      border: 3px dashed var(--frame);
+      border-radius: 34px;
+      padding: clamp(10px, 1.4vw, 18px);
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      min-height: 0;
+    }
+
+    /* 頂部時間欄卡片風 */
+    .header-card {
+      background: var(--card);
+      border: 2px solid #f4c99a;
+      border-radius: 24px;
+      padding: clamp(8px, 1.6vh, 16px) clamp(16px, 2.4vw, 26px);
+      margin-bottom: clamp(8px, 1.6vh, 20px);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      box-shadow: 0 6px 16px rgba(230, 160, 90, 0.08);
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+    .header-left { display: flex; align-items: baseline; gap: clamp(8px, 1.2vw, 14px); flex-wrap: wrap; }
+    .time { font-size: clamp(2rem, 4.6vw, 3.1rem); font-weight: 800; color: var(--teal); letter-spacing: 1px; }
+    .date { font-size: clamp(0.95rem, 1.8vw, 1.3rem); color: var(--pink); font-weight: 700; }
+
+    .header-right { display: flex; align-items: center; gap: clamp(10px, 1.6vw, 16px); }
+    .mini-status { display: flex; flex-direction: column; gap: 4px; font-size: clamp(0.75rem, 1.1vw, 0.85rem); color: var(--muted); }
+    .mini-status span { display: flex; align-items: center; gap: 5px; }
+    .mini-status b { color: var(--ink); font-weight: 700; }
+
+    .refresh-btn {
+      background: linear-gradient(180deg, var(--amber), var(--amber-dark));
+      color: #fff;
+      border: none;
+      border-radius: 16px;
+      padding: clamp(9px, 1.4vw, 12px) clamp(14px, 2vw, 20px);
+      font-size: clamp(0.9rem, 1.6vw, 1.05rem);
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      cursor: pointer;
+      box-shadow: 0 4px 10px rgba(224, 144, 15, 0.35);
+      transition: transform 0.15s ease;
+    }
+    .refresh-btn:active { transform: scale(0.96); }
+    .refresh-btn.spinning .icon { animation: spin 0.7s linear; }
+    @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+
+    /* 儀表板網格 */
+    .dashboard-grid { display: grid; grid-template-columns: 1fr 1fr; gap: clamp(12px, 1.8vw, 20px); flex: 1; min-height: 0; }
+
+    .card { background: var(--card); border: 2px solid #f4c99a; border-radius: 24px; padding: clamp(10px, 2vh, 22px) clamp(14px, 2vw, 22px); box-shadow: 0 6px 16px rgba(230, 160, 90, 0.08); overflow-y: auto; overflow-x: hidden; display: flex; flex-direction: column; }
+    .card-title-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: clamp(6px, 1.6vh, 16px); flex-wrap: wrap; gap: 8px; }
+    .card-title { font-size: clamp(1rem, 1.6vw, 1.2rem); color: #3d405b; font-weight: 700; display: flex; align-items: center; gap: 8px; }
+    .pill-tag { font-size: clamp(0.75rem, 1.2vw, 0.85rem); font-weight: 700; padding: 6px 14px; border-radius: 999px; background: var(--blush-bg); color: var(--blush-text); }
+
+    /* 天氣樣式 */
+    .station-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; flex-wrap: wrap; gap: 8px; }
+    .station-name { font-size: clamp(0.95rem, 1.5vw, 1.15rem); font-weight: 800; color: #333; display: flex; align-items: center; gap: 6px; }
+    .condition-pill { font-size: clamp(0.75rem, 1.2vw, 0.9rem); font-weight: 700; padding: 6px 14px; border-radius: 999px; background: var(--blush-bg); color: var(--blush-text); }
+
+    .temp-row { display: flex; align-items: flex-end; justify-content: space-between; margin-top: clamp(2px, 0.8vh, 6px); }
+    .temp-display { font-size: clamp(2.2rem, 5vh, 4.2rem); font-weight: 800; color: var(--amber); line-height: 1; }
+    .temp-emoji { font-size: clamp(1.7rem, 3.8vh, 3.2rem); }
+    .temp-range { font-size: clamp(0.8rem, 1.3vw, 1rem); color: var(--muted); margin-top: clamp(3px, 0.8vh, 8px); font-weight: 700; }
+
+    .stat-row { display: flex; gap: 12px; margin-top: clamp(6px, 1.6vh, 16px); }
+    .stat-pill { flex: 1; border-radius: 16px; padding: clamp(6px, 1.4vh, 12px) clamp(10px, 1.6vw, 16px); display: flex; align-items: center; justify-content: space-between; font-weight: 700; }
+    .stat-pill.humidity { background: var(--mint-bg); color: var(--mint-text); }
+    .stat-pill.rain { background: var(--blush-bg); color: var(--blush-text); }
+    .stat-pill .stat-label { display: flex; align-items: center; gap: 6px; font-size: clamp(0.8rem, 1.3vw, 0.95rem); }
+    .stat-pill .stat-value { font-size: clamp(0.95rem, 1.5vw, 1.15rem); font-weight: 800; }
+
+    .forecast-section { margin-top: clamp(6px, 1.8vh, 20px); border-top: 1px dashed var(--line); padding-top: clamp(6px, 1.6vh, 16px); }
+    .section-label { font-size: clamp(0.8rem, 1.3vw, 0.95rem); font-weight: 700; color: var(--teal-dark); margin-bottom: clamp(4px, 1vh, 10px); display: flex; align-items: center; gap: 6px; }
+
+    .hourly-rain-container { display: flex; gap: 10px; overflow-x: auto; scrollbar-width: none; }
+    .hourly-rain-container::-webkit-scrollbar { display: none; }
+    .hourly-rain-item { flex: 1 1 0; background: var(--mint-bg); padding: clamp(6px, 1.2vh, 10px) 8px; border-radius: 14px; text-align: center; min-width: 0; }
+    .hourly-rain-item .time { font-size: clamp(0.7rem, 1.1vw, 0.8rem); color: var(--mint-text); font-weight: 700; margin-bottom: 4px; }
+    .hourly-rain-item .prob { font-size: clamp(0.85rem, 1.4vw, 1.05rem); color: var(--teal-dark); font-weight: 800; }
+
+    .forecast-list { display: flex; gap: 10px; padding: clamp(6px, 1.6vh, 14px) 2px 4px; margin-top: 6px; }
+    .forecast-day { flex: 1 1 0; background: var(--cream); padding: clamp(6px, 1.3vh, 12px); border-radius: 16px; text-align: center; min-width: 0; }
+    .forecast-date { font-size: clamp(0.75rem, 1.2vw, 0.88rem); color: var(--pink); font-weight: 800; }
+    .forecast-emoji { font-size: clamp(1.3rem, 2.8vh, 1.9rem); margin: clamp(3px, 0.8vh, 6px) 0; }
+    .forecast-temp { font-size: clamp(0.85rem, 1.4vw, 1.02rem); color: var(--teal-dark); margin: 4px 0; font-weight: 800; }
+    .forecast-psr { font-size: clamp(0.65rem, 1vw, 0.75rem); color: var(--muted); background: #eee; border-radius: 999px; padding: 3px 8px; display: inline-block; margin-top: 4px; }
+
+    /* 巴士卡片樣式 */
+    .bus-row { display: flex; align-items: center; gap: clamp(10px, 1.6vw, 16px); background: var(--cream); border-radius: 18px; padding: clamp(12px, 1.8vw, 16px); margin-bottom: clamp(10px, 1.6vw, 14px); flex-wrap: wrap; }
+    .route-badge { background: var(--teal); color: #fff; font-weight: 800; font-size: clamp(1.15rem, 2vw, 1.5rem); padding: clamp(8px, 1.3vw, 10px) clamp(12px, 1.8vw, 16px); border-radius: 14px; min-width: 56px; text-align: center; }
+    .route-info { flex: 1; min-width: 120px; }
+    .route-dest { font-size: clamp(0.95rem, 1.6vw, 1.1rem); font-weight: 800; color: #333; }
+    .route-note { font-size: clamp(0.78rem, 1.2vw, 0.9rem); color: var(--muted); display: flex; align-items: center; gap: 5px; margin-top: 2px; }
+    .route-eta { text-align: right; }
+    .eta-minutes { font-size: clamp(1.2rem, 2.2vw, 1.5rem); font-weight: 800; color: #27ae60; }
+    .eta-clock { font-size: clamp(0.78rem, 1.2vw, 0.9rem); color: var(--muted); background: #eee; border-radius: 8px; padding: 2px 8px; display: inline-block; margin-top: 4px; font-weight: 700; }
+
+    .bus-divider { font-size: clamp(0.78rem, 1.2vw, 0.85rem); color: var(--muted); font-weight: 700; border-top: 1px dashed var(--line); padding-top: clamp(10px, 1.6vw, 12px); margin-bottom: 10px; }
+    .bus-next-pills { display: flex; gap: 10px; flex-wrap: wrap; }
+    .bus-next-pills .pill { background: var(--mint-bg); color: var(--mint-text); font-weight: 800; font-size: clamp(0.82rem, 1.3vw, 0.95rem); padding: clamp(6px, 1vw, 8px) clamp(10px, 1.6vw, 14px); border-radius: 999px; }
+
+    /* iPad 直向（portrait）時卡片改成上下排列，避免擠壓變形 */
+    @media (max-width: 900px) {
+      .dashboard-grid { grid-template-columns: 1fr; }
+      body { min-height: 100dvh; }
+    }
+    @media (orientation: portrait) {
+      .dashboard-grid { grid-template-columns: 1fr; overflow-y: auto; }
+    }
+  </style>
+</head>
+<body>
+<div class="frame">
+
+  <!-- 頂部時間欄 -->
+  <div class="header-card">
+    <div class="header-left">
+      <span class="time num" id="clock">00:00:00</span>
+      <span class="date" id="date-str">--月--日 (星期--)</span>
+    </div>
+    <div class="header-right">
+      <div class="mini-status">
+        <span>☀️ <b id="weather-mini-time">--:--</b></span>
+        <span>🚌 <b id="bus-mini-time">--:--</b></span>
+      </div>
+      <button class="refresh-btn" id="refresh-btn" onclick="manualRefresh()">
+        <span class="icon">🔄</span> 更新
+      </button>
+    </div>
+  </div>
+
+  <div class="dashboard-grid">
+    <!-- 天氣卡片 -->
+    <div class="card">
+      <div class="card-title-row">
+        <div class="card-title">☀️ 鴨脷洲 / 南區天氣與預報</div>
+        <div class="pill-tag">每時預報</div>
+      </div>
+
+      <div class="station-row">
+        <div class="station-name" id="weather-station">🎯 測站載入中...</div>
+        <div class="condition-pill" id="weather-condition">載入中...</div>
+      </div>
+
+      <div class="temp-row">
+        <div>
+          <div class="temp-display num" id="temp">--°</div>
+          <div class="temp-range" id="temp-range">今日預測: --° - --°C</div>
+        </div>
+        <div class="temp-emoji" id="temp-emoji">🌤️</div>
+      </div>
+
+      <div class="stat-row">
+        <div class="stat-pill humidity">
+          <span class="stat-label">💧 相對濕度</span>
+          <span class="stat-value"><span id="humidity">--</span>%</span>
+        </div>
+        <div class="stat-pill rain">
+          <span class="stat-label">☔️ 降雨概率</span>
+          <span class="stat-value" id="rain-level">--</span>
+        </div>
+      </div>
+
+      <div class="forecast-section">
+        <div class="section-label">📅 每小時氣溫與降雨預測</div>
+        <div class="hourly-rain-container" id="rain-forecast">載入中...</div>
+      </div>
+
+      <div class="forecast-section">
+        <div class="section-label">🗓️ 五天預報</div>
+        <div class="forecast-list" id="forecast-list"></div>
+      </div>
+    </div>
+
+    <!-- 巴士到站卡片 -->
+    <div class="card">
+      <div class="card-title-row">
+        <div class="card-title">🚌 99 往筲箕灣</div>
+        <div class="pill-tag">利東街市站</div>
+      </div>
+
+      <div class="bus-row">
+        <div class="route-badge">99</div>
+        <div class="route-info">
+          <div class="route-dest">往 筲箕灣</div>
+          <div class="route-note">🚏 利東街市站出發</div>
+        </div>
+        <div class="route-eta">
+          <div class="eta-minutes num" id="bus-eta-1">載入中</div>
+          <div class="eta-clock" id="bus-clock-1">--:--</div>
+        </div>
+      </div>
+
+      <div class="bus-divider">後續班次</div>
+      <div class="bus-next-pills" id="bus-next-pills">
+        <span class="pill">--</span>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+  <script>
+    let lastUpdateTimeStr = "--:--";
+    let busFailCount = 0; // 連續失敗次數，用來決定是否要顯示錯誤訊息
+
+    // 帶逾時 + 重試的 fetch，避免政府 API 偶發延遲/失敗就整個掛掉
+    async function fetchWithRetry(url, { timeoutMs = 8000, retries = 2, retryDelayMs = 1500 } = {}) {
+      let lastErr;
+      for (let attempt = 0; attempt <= retries; attempt++) {
+        const controller = new AbortController();
+        const timer = setTimeout(() => controller.abort(), timeoutMs);
+        try {
+          const res = await fetch(url, { signal: controller.signal });
+          clearTimeout(timer);
+          if (!res.ok) throw new Error(`HTTP ${res.status}`);
+          return await res.json();
+        } catch (err) {
+          clearTimeout(timer);
+          lastErr = err;
+          if (attempt < retries) {
+            await new Promise(r => setTimeout(r, retryDelayMs));
+          }
+        }
+      }
+      throw lastErr;
+    }
+
+    // 1. 即時時鐘（只顯示時:分，不顯示秒）
+    function updateClock() {
+      const now = new Date();
+      document.getElementById('clock').innerText = `${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
+      const days = ['日', '一', '二', '三', '四', '五', '六'];
+      document.getElementById('date-str').innerText = `${now.getMonth()+1}月${now.getDate()}日 (星期${days[now.getDay()]})`;
+    }
+    setInterval(updateClock, 1000);
+    updateClock();
+
+    function hhmm(d) {
+      return `${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`;
+    }
+
+    function recordWeatherUpdate() {
+      document.getElementById('weather-mini-time').innerText = hhmm(new Date());
+    }
+    function recordBusUpdate() {
+      document.getElementById('bus-mini-time').innerText = hhmm(new Date());
+    }
+
+    function getWeatherEmoji(iconNum) {
+      if (iconNum >= 50 && iconNum <= 51) return '☀️';
+      if (iconNum >= 52 && iconNum <= 54) return '⛅';
+      if (iconNum >= 60 && iconNum <= 61) return '☁️';
+      if (iconNum >= 62 && iconNum <= 65) return '🌧️';
+      if (iconNum >= 90 && iconNum <= 93) return '⛈️';
+      return '🌤️';
+    }
+
+    function rainLevelLabel(prob) {
+      if (prob === null || prob === undefined || isNaN(prob)) return '--';
+      if (prob >= 70) return '高';
+      if (prob >= 40) return '中';
+      if (prob > 0) return '低';
+      return '極低';
+    }
+
+    async function fetchHourlyRain() {
+      try {
+        const data = await fetchWithRetry('https://api.open-meteo.com/v1/forecast?latitude=22.24&longitude=114.15&hourly=precipitation_probability&timezone=Asia%2FHong_Kong&forecast_days=2');
+        const now = new Date();
+
+        let currentIndex = data.hourly.time.findIndex(t => new Date(t).getTime() >= now.getTime() - 1800000);
+        if (currentIndex === -1) currentIndex = 0;
+
+        const nextProb = data.hourly.precipitation_probability[currentIndex];
+        document.getElementById('rain-level').innerText = rainLevelLabel(nextProb);
+
+        const rainHTML = data.hourly.time.slice(currentIndex, currentIndex + 5).map((timeStr, i) => {
+          const hourDate = new Date(timeStr);
+          const hourStr = String(hourDate.getHours()).padStart(2, '0') + ':00';
+          const prob = data.hourly.precipitation_probability[currentIndex + i];
+          return `
+            <div class="hourly-rain-item">
+              <div class="time">${hourStr}</div>
+              <div class="prob">💧${prob}%</div>
+            </div>`;
+        }).join('');
+
+        document.getElementById('rain-forecast').innerHTML = rainHTML;
+      } catch(e) {
+        console.error('降雨預報載入失敗', e);
+      }
+    }
+
+    async function fetchWeather() {
+      try {
+        const dataNow = await fetchWithRetry('https://data.weather.gov.hk/weatherAPI/opendata/weather.php?dataType=rhrread&lang=tc');
+        const targetTemp = dataNow.temperature.data.find(t => ['鴨脷洲', '黃竹坑', '香港仔'].includes(t.place)) || dataNow.temperature.data[0];
+
+        document.getElementById('temp').innerText = `${targetTemp.value}°`;
+        document.getElementById('humidity').innerText = dataNow.humidity.data[0].value;
+        document.getElementById('weather-station').innerText = `🎯 ${targetTemp.place}測站`;
+
+        const data9Day = await fetchWithRetry('https://data.weather.gov.hk/weatherAPI/opendata/weather.php?dataType=fnd&lang=tc');
+
+        const today = data9Day.weatherForecast[0];
+        document.getElementById('weather-condition').innerText = today.forecastWeather;
+        document.getElementById('temp-emoji').innerText = getWeatherEmoji(today.ForecastIcon);
+        document.getElementById('temp-range').innerText = `今日預測: ${today.forecastMintemp.value}° - ${today.forecastMaxtemp.value}°C`;
+
+        const forecastHTML = data9Day.weatherForecast.slice(0, 5).map(day => {
+          const dateStr = `${day.forecastDate.substring(6,8)}/${day.forecastDate.substring(4,6)}`;
+          const weekDay = day.week.replace('星期', '');
+          const emoji = getWeatherEmoji(day.ForecastIcon);
+          return `
+            <div class="forecast-day">
+              <div class="forecast-date">${dateStr} (${weekDay})</div>
+              <div class="forecast-emoji">${emoji}</div>
+              <div class="forecast-temp">${day.forecastMintemp.value}°-${day.forecastMaxtemp.value}°</div>
+              <div class="forecast-psr">${day.PSR}</div>
+            </div>`;
+        }).join('');
+        document.getElementById('forecast-list').innerHTML = forecastHTML;
+
+        recordWeatherUpdate();
+      } catch(e) { console.error('天氣數據載入失敗', e); }
+    }
+
+    // 2. 透過公開 API 資源串接 99 號城巴即時到站時間
+    async function fetchCitybusETA() {
+      const stopId = '002211';
+      const route = '99';
+      try {
+        const result = await fetchWithRetry(
+          `https://rt.data.gov.hk/v2/transport/citybus/eta/CTB/${stopId}/${route}`
+        );
+
+        if (!result || !Array.isArray(result.data)) {
+          throw new Error('回應格式異常');
+        }
+
+        busFailCount = 0; // 成功了，重置失敗計數
+
+        const etas = result.data.filter(b => b.eta);
+
+        if (etas.length > 0) {
+          const time1 = new Date(etas[0].eta);
+          const diff1 = Math.max(0, Math.round((time1 - new Date()) / 60000));
+          document.getElementById('bus-eta-1').innerText = diff1 === 0 ? "即將抵達" : `${diff1} 分鐘`;
+          document.getElementById('bus-clock-1').innerText = hhmm(time1);
+
+          const morePills = etas.slice(1, 3).map(b => {
+            const t = new Date(b.eta);
+            const diff = Math.max(0, Math.round((t - new Date()) / 60000));
+            return `<span class="pill">${diff}分 (${hhmm(t)})</span>`;
+          }).join('');
+          document.getElementById('bus-next-pills').innerHTML = morePills || '<span class="pill">暫無後續班次</span>';
+        } else {
+          // API 有回應，但目前真的沒有班次資料（非連線問題）
+          document.getElementById('bus-eta-1').innerText = "暫無班次";
+          document.getElementById('bus-clock-1').innerText = "--:--";
+          document.getElementById('bus-next-pills').innerHTML = '<span class="pill">暫無班次</span>';
+        }
+        recordBusUpdate();
+      } catch (e) {
+        console.error('巴士資料載入失敗', e);
+        busFailCount++;
+        // 只有連續失敗（例如超過 2 次，約 1 分鐘）才顯示錯誤，
+        // 單次的短暫延遲不會洗掉畫面上原本正確的到站時間
+        if (busFailCount >= 2) {
+          document.getElementById('bus-eta-1').innerText = "連線失敗";
+          document.getElementById('bus-clock-1').innerText = "重試中...";
+        }
+      }
+    }
+
+    async function manualRefresh() {
+      const btn = document.getElementById('refresh-btn');
+      btn.classList.add('spinning');
+      btn.disabled = true;
+      await Promise.all([fetchHourlyRain(), fetchWeather(), fetchCitybusETA()]);
+      btn.classList.remove('spinning');
+      btn.disabled = false;
+    }
+
+    // 初始化與設定計時器
+    fetchHourlyRain();
+    fetchWeather();
+    fetchCitybusETA();
+    setInterval(fetchHourlyRain, 600000);
+    setInterval(fetchWeather, 600000);
+    setInterval(fetchCitybusETA, 30000);
+
+    // iOS/iPadOS 在背景時會節流計時器，回到前景時立即補抓一次最新資料，
+    // 避免畫面停留在舊資料造成「看起來不穩定」的錯覺
+    document.addEventListener('visibilitychange', () => {
+      if (document.visibilityState === 'visible') {
+        fetchCitybusETA();
+        fetchWeather();
+      }
+    });
+  </script>
+</body>
+</html>
