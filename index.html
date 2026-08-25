@@ -132,19 +132,18 @@
     .forecast-temp { font-size: clamp(0.85rem, 1.4vw, 1.02rem); color: var(--teal-dark); margin: 4px 0; font-weight: 800; }
     .forecast-psr { font-size: clamp(0.65rem, 1vw, 0.75rem); color: var(--muted); background: #eee; border-radius: 999px; padding: 3px 8px; display: inline-block; margin-top: 4px; }
 
-    /* 巴士卡片樣式 */
-    .bus-row { display: flex; align-items: center; gap: clamp(10px, 1.6vw, 16px); background: var(--cream); border-radius: 18px; padding: clamp(12px, 1.8vw, 16px); margin-bottom: clamp(10px, 1.6vw, 14px); flex-wrap: wrap; }
-    .route-badge { background: var(--teal); color: #fff; font-weight: 800; font-size: clamp(1.15rem, 2vw, 1.5rem); padding: clamp(8px, 1.3vw, 10px) clamp(12px, 1.8vw, 16px); border-radius: 14px; min-width: 56px; text-align: center; }
-    .route-info { flex: 1; min-width: 120px; }
-    .route-dest { font-size: clamp(0.95rem, 1.6vw, 1.1rem); font-weight: 800; color: #333; }
-    .route-note { font-size: clamp(0.78rem, 1.2vw, 0.9rem); color: var(--muted); display: flex; align-items: center; gap: 5px; margin-top: 2px; }
-    .route-eta { text-align: right; }
-    .eta-minutes { font-size: clamp(1.2rem, 2.2vw, 1.5rem); font-weight: 800; color: #27ae60; }
-    .eta-clock { font-size: clamp(0.78rem, 1.2vw, 0.9rem); color: var(--muted); background: #eee; border-radius: 8px; padding: 2px 8px; display: inline-block; margin-top: 4px; font-weight: 700; }
-
-    .bus-divider { font-size: clamp(0.78rem, 1.2vw, 0.85rem); color: var(--muted); font-weight: 700; border-top: 1px dashed var(--line); padding-top: clamp(10px, 1.6vw, 12px); margin-bottom: 10px; }
-    .bus-next-pills { display: flex; gap: 10px; flex-wrap: wrap; }
-    .bus-next-pills .pill { background: var(--mint-bg); color: var(--mint-text); font-weight: 800; font-size: clamp(0.82rem, 1.3vw, 0.95rem); padding: clamp(6px, 1vw, 8px) clamp(10px, 1.6vw, 14px); border-radius: 999px; }
+    /* 股票指數卡片樣式 */
+    .stock-row { display: flex; align-items: center; gap: clamp(10px, 1.6vw, 16px); background: var(--cream); border-radius: 18px; padding: clamp(12px, 1.6vh, 16px); margin-bottom: clamp(8px, 1.4vh, 12px); flex-wrap: wrap; }
+    .stock-badge { background: var(--teal); color: #fff; font-weight: 800; font-size: clamp(0.95rem, 1.6vw, 1.15rem); padding: clamp(8px, 1.3vw, 10px) clamp(10px, 1.6vw, 14px); border-radius: 14px; min-width: 60px; text-align: center; letter-spacing: 0.5px; }
+    .stock-info { flex: 1; min-width: 100px; }
+    .stock-name { font-size: clamp(0.9rem, 1.5vw, 1.05rem); font-weight: 800; color: #333; }
+    .stock-market { font-size: clamp(0.72rem, 1.1vw, 0.82rem); color: var(--muted); margin-top: 2px; }
+    .stock-quote { text-align: right; }
+    .stock-price { font-size: clamp(1.15rem, 2.1vw, 1.45rem); font-weight: 800; color: #333; }
+    .stock-change { font-size: clamp(0.82rem, 1.3vw, 0.95rem); font-weight: 800; border-radius: 8px; padding: 2px 8px; display: inline-block; margin-top: 4px; }
+    .stock-change.up { color: #1f8f57; background: #e9f8f0; }
+    .stock-change.down { color: #c0392b; background: #fdeceb; }
+    .stock-change.flat { color: var(--muted); background: #eee; }
 
     /* iPad 直向（portrait）時卡片改成上下排列，避免擠壓變形 */
     @media (max-width: 900px) {
@@ -168,7 +167,7 @@
     <div class="header-right">
       <div class="mini-status">
         <span>☀️ <b id="weather-mini-time">--:--</b></span>
-        <span>🚌 <b id="bus-mini-time">--:--</b></span>
+        <span>📈 <b id="stock-mini-time">--:--</b></span>
       </div>
       <button class="refresh-btn" id="refresh-btn" onclick="manualRefresh()">
         <span class="icon">🔄</span> 更新
@@ -219,28 +218,107 @@
       </div>
     </div>
 
-    <!-- 巴士到站卡片 -->
+    <!-- 股票指數卡片 -->
     <div class="card">
       <div class="card-title-row">
-        <div class="card-title">🚌 99 往筲箕灣</div>
-        <div class="pill-tag">利東街市站</div>
+        <div class="card-title">📈 主要指數</div>
+        <div class="pill-tag">即市報價</div>
       </div>
 
-      <div class="bus-row">
-        <div class="route-badge">99</div>
-        <div class="route-info">
-          <div class="route-dest">往 筲箕灣</div>
-          <div class="route-note">🚏 利東街市站出發</div>
+      <div class="stock-row">
+        <div class="stock-badge">HSI</div>
+        <div class="stock-info">
+          <div class="stock-name">恒生指數</div>
+          <div class="stock-market" id="hsi-market">--</div>
         </div>
-        <div class="route-eta">
-          <div class="eta-minutes num" id="bus-eta-1">載入中</div>
-          <div class="eta-clock" id="bus-clock-1">--:--</div>
+        <div class="stock-quote">
+          <div class="stock-price num" id="hsi-price">載入中</div>
+          <div class="stock-change flat" id="hsi-change">--</div>
         </div>
       </div>
 
-      <div class="bus-divider">後續班次</div>
-      <div class="bus-next-pills" id="bus-next-pills">
-        <span class="pill">--</span>
+      <div class="stock-row">
+        <div class="stock-badge">DJI</div>
+        <div class="stock-info">
+          <div class="stock-name">道瓊斯工業指數</div>
+          <div class="stock-market" id="dji-market">--</div>
+        </div>
+        <div class="stock-quote">
+          <div class="stock-price num" id="dji-price">載入中</div>
+          <div class="stock-change flat" id="dji-change">--</div>
+        </div>
+      </div>
+
+      <div class="stock-row">
+        <div class="stock-badge">IXIC</div>
+        <div class="stock-info">
+          <div class="stock-name">納斯達克指數</div>
+          <div class="stock-market" id="ixic-market">--</div>
+        </div>
+        <div class="stock-quote">
+          <div class="stock-price num" id="ixic-price">載入中</div>
+          <div class="stock-change flat" id="ixic-change">--</div>
+        </div>
+      </div>
+
+      <div class="stock-row">
+        <div class="stock-badge">SPX</div>
+        <div class="stock-info">
+          <div class="stock-name">標普500指數</div>
+          <div class="stock-market" id="gspc-market">--</div>
+        </div>
+        <div class="stock-quote">
+          <div class="stock-price num" id="gspc-price">載入中</div>
+          <div class="stock-change flat" id="gspc-change">--</div>
+        </div>
+      </div>
+
+      <div class="stock-row">
+        <div class="stock-badge">RUT</div>
+        <div class="stock-info">
+          <div class="stock-name">羅素2000指數</div>
+          <div class="stock-market" id="rut-market">--</div>
+        </div>
+        <div class="stock-quote">
+          <div class="stock-price num" id="rut-price">載入中</div>
+          <div class="stock-change flat" id="rut-change">--</div>
+        </div>
+      </div>
+
+      <div class="stock-row">
+        <div class="stock-badge">VIX</div>
+        <div class="stock-info">
+          <div class="stock-name">恐慌指數</div>
+          <div class="stock-market" id="vix-market">--</div>
+        </div>
+        <div class="stock-quote">
+          <div class="stock-price num" id="vix-price">載入中</div>
+          <div class="stock-change flat" id="vix-change">--</div>
+        </div>
+      </div>
+
+      <div class="stock-row">
+        <div class="stock-badge">GOLD</div>
+        <div class="stock-info">
+          <div class="stock-name">黃金期貨</div>
+          <div class="stock-market" id="gold-market">--</div>
+        </div>
+        <div class="stock-quote">
+          <div class="stock-price num" id="gold-price">載入中</div>
+          <div class="stock-change flat" id="gold-change">--</div>
+        </div>
+      </div>
+
+      <div class="stock-row">
+        <div class="stock-badge">BTC</div>
+        <div class="stock-info">
+          <div class="stock-name">比特幣</div>
+          <div class="stock-market" id="btc-market">--</div>
+        </div>
+        <div class="stock-quote">
+          <div class="stock-price num" id="btc-price">載入中</div>
+          <div class="stock-change flat" id="btc-change">--</div>
+        </div>
       </div>
     </div>
   </div>
@@ -249,7 +327,7 @@
 
   <script>
     let lastUpdateTimeStr = "--:--";
-    let busFailCount = 0; // 連續失敗次數，用來決定是否要顯示錯誤訊息
+    let stockFailCount = 0; // 連續失敗次數，用來決定是否要顯示錯誤訊息
 
     // 帶逾時 + 重試的 fetch，避免政府 API 偶發延遲/失敗就整個掛掉
     async function fetchWithRetry(url, { timeoutMs = 8000, retries = 2, retryDelayMs = 1500 } = {}) {
@@ -290,8 +368,8 @@
     function recordWeatherUpdate() {
       document.getElementById('weather-mini-time').innerText = hhmm(new Date());
     }
-    function recordBusUpdate() {
-      document.getElementById('bus-mini-time').innerText = hhmm(new Date());
+    function recordStockUpdate() {
+      document.getElementById('stock-mini-time').innerText = hhmm(new Date());
     }
 
     function getWeatherEmoji(iconNum) {
@@ -373,50 +451,69 @@
       } catch(e) { console.error('天氣數據載入失敗', e); }
     }
 
-    // 2. 透過公開 API 資源串接 99 號城巴即時到站時間
-    async function fetchCitybusETA() {
-      const stopId = '002211';
-      const route = '99';
-      try {
-        const result = await fetchWithRetry(
-          `https://rt.data.gov.hk/v2/transport/citybus/eta/CTB/${stopId}/${route}`
-        );
+    // 2. 透過 Yahoo Finance 公開數據串接主要指數報價（透過 CORS proxy，因 Yahoo 本身不開放瀏覽器直接跨網域讀取）
+    const STOCK_LIST = [
+      { symbol: '%5EHSI',  prefix: 'hsi',  currency: '' },
+      { symbol: '%5EDJI',  prefix: 'dji',  currency: '' },
+      { symbol: '%5EIXIC', prefix: 'ixic', currency: '' },
+      { symbol: '%5EGSPC', prefix: 'gspc', currency: '' },
+      { symbol: '%5ERUT',  prefix: 'rut',  currency: '' },
+      { symbol: '%5EVIX',  prefix: 'vix',  currency: '' },
+      { symbol: 'GC%3DF',  prefix: 'gold', currency: '' },
+      { symbol: 'BTC-USD', prefix: 'btc',  currency: '' }
+    ];
 
-        if (!result || !Array.isArray(result.data)) {
-          throw new Error('回應格式異常');
-        }
+    function marketStateLabel(state) {
+      const map = {
+        PRE: '盤前', PREPRE: '盤前',
+        REGULAR: '開市中',
+        POST: '盤後', POSTPOST: '盤後',
+        CLOSED: '已收市'
+      };
+      return map[state] || '--';
+    }
 
-        busFailCount = 0; // 成功了，重置失敗計數
+    async function fetchOneStock({ symbol, prefix }) {
+      const target = `https://query1.finance.yahoo.com/v8/finance/chart/${symbol}`;
+      const proxied = `https://api.allorigins.win/raw?url=${encodeURIComponent(target)}`;
+      const data = await fetchWithRetry(proxied, { timeoutMs: 9000, retries: 2, retryDelayMs: 1200 });
+      const meta = data?.chart?.result?.[0]?.meta;
+      if (!meta || typeof meta.regularMarketPrice !== 'number') throw new Error('無報價資料');
 
-        const etas = result.data.filter(b => b.eta);
+      const price = meta.regularMarketPrice;
+      const prevClose = meta.previousClose ?? meta.chartPreviousClose;
+      const change = prevClose ? price - prevClose : 0;
+      const changePct = prevClose ? (change / prevClose) * 100 : 0;
 
-        if (etas.length > 0) {
-          const time1 = new Date(etas[0].eta);
-          const diff1 = Math.max(0, Math.round((time1 - new Date()) / 60000));
-          document.getElementById('bus-eta-1').innerText = diff1 === 0 ? "即將抵達" : `${diff1} 分鐘`;
-          document.getElementById('bus-clock-1').innerText = hhmm(time1);
+      document.getElementById(`${prefix}-price`).innerText = price.toLocaleString('en-US', { maximumFractionDigits: 2 });
+      document.getElementById(`${prefix}-market`).innerText = marketStateLabel(meta.marketState);
 
-          const morePills = etas.slice(1, 3).map(b => {
-            const t = new Date(b.eta);
-            const diff = Math.max(0, Math.round((t - new Date()) / 60000));
-            return `<span class="pill">${diff}分 (${hhmm(t)})</span>`;
-          }).join('');
-          document.getElementById('bus-next-pills').innerHTML = morePills || '<span class="pill">暫無後續班次</span>';
-        } else {
-          // API 有回應，但目前真的沒有班次資料（非連線問題）
-          document.getElementById('bus-eta-1').innerText = "暫無班次";
-          document.getElementById('bus-clock-1').innerText = "--:--";
-          document.getElementById('bus-next-pills').innerHTML = '<span class="pill">暫無班次</span>';
-        }
-        recordBusUpdate();
-      } catch (e) {
-        console.error('巴士資料載入失敗', e);
-        busFailCount++;
-        // 只有連續失敗（例如超過 2 次，約 1 分鐘）才顯示錯誤，
-        // 單次的短暫延遲不會洗掉畫面上原本正確的到站時間
-        if (busFailCount >= 2) {
-          document.getElementById('bus-eta-1').innerText = "連線失敗";
-          document.getElementById('bus-clock-1').innerText = "重試中...";
+      const dir = change > 0.005 ? 'up' : change < -0.005 ? 'down' : 'flat';
+      const sign = change > 0 ? '+' : '';
+      const changeEl = document.getElementById(`${prefix}-change`);
+      changeEl.className = `stock-change ${dir}`;
+      changeEl.innerText = `${sign}${change.toFixed(2)} (${sign}${changePct.toFixed(2)}%)`;
+    }
+
+    async function fetchStockIndices() {
+      const results = await Promise.allSettled(STOCK_LIST.map(fetchOneStock));
+      const anySuccess = results.some(r => r.status === 'fulfilled');
+      const allFailed = results.every(r => r.status === 'rejected');
+
+      results.forEach((r, i) => {
+        if (r.status === 'rejected') console.error(`${STOCK_LIST[i].prefix} 指數載入失敗`, r.reason);
+      });
+
+      if (anySuccess) {
+        stockFailCount = 0;
+        recordStockUpdate();
+      } else if (allFailed) {
+        stockFailCount++;
+        // 只有連續失敗才整批顯示錯誤，單次延遲不覆蓋原本正確的報價
+        if (stockFailCount >= 2) {
+          STOCK_LIST.forEach(({ prefix }) => {
+            document.getElementById(`${prefix}-market`).innerText = '連線失敗，重試中...';
+          });
         }
       }
     }
@@ -425,7 +522,7 @@
       const btn = document.getElementById('refresh-btn');
       btn.classList.add('spinning');
       btn.disabled = true;
-      await Promise.all([fetchHourlyRain(), fetchWeather(), fetchCitybusETA()]);
+      await Promise.all([fetchHourlyRain(), fetchWeather(), fetchStockIndices()]);
       btn.classList.remove('spinning');
       btn.disabled = false;
     }
@@ -433,16 +530,16 @@
     // 初始化與設定計時器
     fetchHourlyRain();
     fetchWeather();
-    fetchCitybusETA();
+    fetchStockIndices();
     setInterval(fetchHourlyRain, 600000);
     setInterval(fetchWeather, 600000);
-    setInterval(fetchCitybusETA, 30000);
+    setInterval(fetchStockIndices, 30000);
 
     // iOS/iPadOS 在背景時會節流計時器，回到前景時立即補抓一次最新資料，
     // 避免畫面停留在舊資料造成「看起來不穩定」的錯覺
     document.addEventListener('visibilitychange', () => {
       if (document.visibilityState === 'visible') {
-        fetchCitybusETA();
+        fetchStockIndices();
         fetchWeather();
       }
     });
