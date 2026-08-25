@@ -132,18 +132,19 @@
     .forecast-temp { font-size: clamp(0.85rem, 1.4vw, 1.02rem); color: var(--teal-dark); margin: 4px 0; font-weight: 800; }
     .forecast-psr { font-size: clamp(0.65rem, 1vw, 0.75rem); color: var(--muted); background: #eee; border-radius: 999px; padding: 3px 8px; display: inline-block; margin-top: 4px; }
 
-    /* 股票指數卡片樣式 */
-    .stock-row { display: flex; align-items: center; gap: clamp(10px, 1.6vw, 16px); background: var(--cream); border-radius: 18px; padding: clamp(12px, 1.6vh, 16px); margin-bottom: clamp(8px, 1.4vh, 12px); flex-wrap: wrap; }
-    .stock-badge { background: var(--teal); color: #fff; font-weight: 800; font-size: clamp(0.95rem, 1.6vw, 1.15rem); padding: clamp(8px, 1.3vw, 10px) clamp(10px, 1.6vw, 14px); border-radius: 14px; min-width: 60px; text-align: center; letter-spacing: 0.5px; }
-    .stock-info { flex: 1; min-width: 100px; }
-    .stock-name { font-size: clamp(0.9rem, 1.5vw, 1.05rem); font-weight: 800; color: #333; }
-    .stock-market { font-size: clamp(0.72rem, 1.1vw, 0.82rem); color: var(--muted); margin-top: 2px; }
-    .stock-quote { text-align: right; }
-    .stock-price { font-size: clamp(1.15rem, 2.1vw, 1.45rem); font-weight: 800; color: #333; }
-    .stock-change { font-size: clamp(0.82rem, 1.3vw, 0.95rem); font-weight: 800; border-radius: 8px; padding: 2px 8px; display: inline-block; margin-top: 4px; }
+    /* 股票指數卡片樣式：改成 2 欄小卡片，方便 8 項一次顯示完 */
+    .stock-grid { display: grid; grid-template-columns: 1fr 1fr; gap: clamp(6px, 1.2vh, 10px) clamp(8px, 1.2vw, 12px); flex: 1; }
+    .stock-row { display: flex; flex-direction: column; gap: clamp(4px, 0.8vh, 6px); background: var(--cream); border-radius: 14px; padding: clamp(8px, 1.3vh, 12px) clamp(10px, 1.3vw, 14px); }
+    .stock-top { display: flex; align-items: center; gap: 8px; }
+    .stock-badge { background: var(--teal); color: #fff; font-weight: 800; font-size: clamp(0.68rem, 1.05vw, 0.78rem); padding: clamp(3px, 0.6vh, 4px) clamp(7px, 1vw, 9px); border-radius: 8px; letter-spacing: 0.5px; }
+    .stock-name { font-size: clamp(0.72rem, 1.15vw, 0.85rem); font-weight: 700; color: #333; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .stock-quote-row { display: flex; align-items: baseline; justify-content: space-between; gap: 6px; }
+    .stock-price { font-size: clamp(0.98rem, 1.7vw, 1.2rem); font-weight: 800; color: #333; }
+    .stock-change { font-size: clamp(0.68rem, 1.05vw, 0.78rem); font-weight: 800; border-radius: 7px; padding: 2px 6px; white-space: nowrap; }
     .stock-change.up { color: #1f8f57; background: #e9f8f0; }
     .stock-change.down { color: #c0392b; background: #fdeceb; }
     .stock-change.flat { color: var(--muted); background: #eee; }
+    .stock-market { font-size: clamp(0.6rem, 0.95vw, 0.68rem); color: var(--muted); }
 
     /* iPad 直向（portrait）時卡片改成上下排列，避免擠壓變形 */
     @media (max-width: 900px) {
@@ -225,99 +226,77 @@
         <div class="pill-tag">即市報價</div>
       </div>
 
-      <div class="stock-row">
-        <div class="stock-badge">HSI</div>
-        <div class="stock-info">
-          <div class="stock-name">恒生指數</div>
+      <div class="stock-grid">
+        <div class="stock-row">
+          <div class="stock-top"><span class="stock-badge">HSI</span><span class="stock-name">恒生指數</span></div>
+          <div class="stock-quote-row">
+            <span class="stock-price num" id="hsi-price">載入中</span>
+            <span class="stock-change flat" id="hsi-change">--</span>
+          </div>
           <div class="stock-market" id="hsi-market">--</div>
         </div>
-        <div class="stock-quote">
-          <div class="stock-price num" id="hsi-price">載入中</div>
-          <div class="stock-change flat" id="hsi-change">--</div>
-        </div>
-      </div>
 
-      <div class="stock-row">
-        <div class="stock-badge">DJI</div>
-        <div class="stock-info">
-          <div class="stock-name">道瓊斯工業指數</div>
+        <div class="stock-row">
+          <div class="stock-top"><span class="stock-badge">DJI</span><span class="stock-name">道瓊斯</span></div>
+          <div class="stock-quote-row">
+            <span class="stock-price num" id="dji-price">載入中</span>
+            <span class="stock-change flat" id="dji-change">--</span>
+          </div>
           <div class="stock-market" id="dji-market">--</div>
         </div>
-        <div class="stock-quote">
-          <div class="stock-price num" id="dji-price">載入中</div>
-          <div class="stock-change flat" id="dji-change">--</div>
-        </div>
-      </div>
 
-      <div class="stock-row">
-        <div class="stock-badge">IXIC</div>
-        <div class="stock-info">
-          <div class="stock-name">納斯達克指數</div>
+        <div class="stock-row">
+          <div class="stock-top"><span class="stock-badge">IXIC</span><span class="stock-name">納斯達克</span></div>
+          <div class="stock-quote-row">
+            <span class="stock-price num" id="ixic-price">載入中</span>
+            <span class="stock-change flat" id="ixic-change">--</span>
+          </div>
           <div class="stock-market" id="ixic-market">--</div>
         </div>
-        <div class="stock-quote">
-          <div class="stock-price num" id="ixic-price">載入中</div>
-          <div class="stock-change flat" id="ixic-change">--</div>
-        </div>
-      </div>
 
-      <div class="stock-row">
-        <div class="stock-badge">SPX</div>
-        <div class="stock-info">
-          <div class="stock-name">標普500指數</div>
+        <div class="stock-row">
+          <div class="stock-top"><span class="stock-badge">SPX</span><span class="stock-name">標普500</span></div>
+          <div class="stock-quote-row">
+            <span class="stock-price num" id="gspc-price">載入中</span>
+            <span class="stock-change flat" id="gspc-change">--</span>
+          </div>
           <div class="stock-market" id="gspc-market">--</div>
         </div>
-        <div class="stock-quote">
-          <div class="stock-price num" id="gspc-price">載入中</div>
-          <div class="stock-change flat" id="gspc-change">--</div>
-        </div>
-      </div>
 
-      <div class="stock-row">
-        <div class="stock-badge">RUT</div>
-        <div class="stock-info">
-          <div class="stock-name">羅素2000指數</div>
+        <div class="stock-row">
+          <div class="stock-top"><span class="stock-badge">RUT</span><span class="stock-name">羅素2000</span></div>
+          <div class="stock-quote-row">
+            <span class="stock-price num" id="rut-price">載入中</span>
+            <span class="stock-change flat" id="rut-change">--</span>
+          </div>
           <div class="stock-market" id="rut-market">--</div>
         </div>
-        <div class="stock-quote">
-          <div class="stock-price num" id="rut-price">載入中</div>
-          <div class="stock-change flat" id="rut-change">--</div>
-        </div>
-      </div>
 
-      <div class="stock-row">
-        <div class="stock-badge">VIX</div>
-        <div class="stock-info">
-          <div class="stock-name">恐慌指數</div>
+        <div class="stock-row">
+          <div class="stock-top"><span class="stock-badge">VIX</span><span class="stock-name">恐慌指數</span></div>
+          <div class="stock-quote-row">
+            <span class="stock-price num" id="vix-price">載入中</span>
+            <span class="stock-change flat" id="vix-change">--</span>
+          </div>
           <div class="stock-market" id="vix-market">--</div>
         </div>
-        <div class="stock-quote">
-          <div class="stock-price num" id="vix-price">載入中</div>
-          <div class="stock-change flat" id="vix-change">--</div>
-        </div>
-      </div>
 
-      <div class="stock-row">
-        <div class="stock-badge">GOLD</div>
-        <div class="stock-info">
-          <div class="stock-name">黃金期貨</div>
+        <div class="stock-row">
+          <div class="stock-top"><span class="stock-badge">GOLD</span><span class="stock-name">黃金期貨</span></div>
+          <div class="stock-quote-row">
+            <span class="stock-price num" id="gold-price">載入中</span>
+            <span class="stock-change flat" id="gold-change">--</span>
+          </div>
           <div class="stock-market" id="gold-market">--</div>
         </div>
-        <div class="stock-quote">
-          <div class="stock-price num" id="gold-price">載入中</div>
-          <div class="stock-change flat" id="gold-change">--</div>
-        </div>
-      </div>
 
-      <div class="stock-row">
-        <div class="stock-badge">BTC</div>
-        <div class="stock-info">
-          <div class="stock-name">比特幣</div>
+        <div class="stock-row">
+          <div class="stock-top"><span class="stock-badge">BTC</span><span class="stock-name">比特幣</span></div>
+          <div class="stock-quote-row">
+            <span class="stock-price num" id="btc-price">載入中</span>
+            <span class="stock-change flat" id="btc-change">--</span>
+          </div>
           <div class="stock-market" id="btc-market">--</div>
-        </div>
-        <div class="stock-quote">
-          <div class="stock-price num" id="btc-price">載入中</div>
-          <div class="stock-change flat" id="btc-change">--</div>
         </div>
       </div>
     </div>
