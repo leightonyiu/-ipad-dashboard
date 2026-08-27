@@ -100,13 +100,12 @@
     .pill-tag { font-size: clamp(0.75rem, 1.2vw, 0.85rem); font-weight: 700; padding: 6px 14px; border-radius: 999px; background: var(--blush-bg); color: var(--blush-text); }
 
     /* 天氣樣式 */
-    .station-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; flex-wrap: wrap; gap: 8px; }
-    .station-name { font-size: clamp(0.95rem, 1.5vw, 1.15rem); font-weight: 800; color: #333; display: flex; align-items: center; gap: 6px; }
+    .station-row { display: flex; align-items: center; justify-content: flex-end; margin-bottom: 10px; flex-wrap: wrap; gap: 8px; }
     .condition-pill { font-size: clamp(0.75rem, 1.2vw, 0.9rem); font-weight: 700; padding: 6px 14px; border-radius: 999px; background: var(--blush-bg); color: var(--blush-text); }
 
     .temp-row { display: flex; align-items: flex-end; justify-content: space-between; margin-top: clamp(2px, 0.8vh, 6px); }
-    .temp-display { font-size: clamp(2.2rem, 5vh, 4.2rem); font-weight: 800; color: var(--amber); line-height: 1; }
-    .temp-emoji { font-size: clamp(1.7rem, 3.8vh, 3.2rem); }
+    .temp-display { font-size: clamp(3.2rem, 7.5vh, 6rem); font-weight: 800; color: var(--amber); line-height: 1; }
+    .temp-emoji { font-size: clamp(2.4rem, 5.5vh, 4.4rem); }
     .temp-range { font-size: clamp(0.8rem, 1.3vw, 1rem); color: var(--muted); margin-top: clamp(3px, 0.8vh, 8px); font-weight: 700; }
 
     .stat-row { display: flex; gap: 12px; margin-top: clamp(6px, 1.6vh, 16px); }
@@ -184,7 +183,6 @@
       </div>
 
       <div class="station-row">
-        <div class="station-name" id="weather-station">🎯 測站載入中...</div>
         <div class="condition-pill" id="weather-condition">載入中...</div>
       </div>
 
@@ -394,7 +392,6 @@
 
         document.getElementById('temp').innerText = `${targetTemp.value}°`;
         document.getElementById('humidity').innerText = dataNow.humidity.data[0].value;
-        document.getElementById('weather-station').innerText = `🎯 ${targetTemp.place}測站`;
 
         const data9Day = await fetchWithRetry('https://data.weather.gov.hk/weatherAPI/opendata/weather.php?dataType=fnd&lang=tc');
 
