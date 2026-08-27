@@ -100,10 +100,9 @@
     .pill-tag { font-size: clamp(0.75rem, 1.2vw, 0.85rem); font-weight: 700; padding: 6px 14px; border-radius: 999px; background: var(--blush-bg); color: var(--blush-text); }
 
     /* 天氣樣式 */
-    .station-row { display: flex; align-items: center; justify-content: flex-end; margin-bottom: 10px; flex-wrap: wrap; gap: 8px; }
     .condition-pill { font-size: clamp(0.75rem, 1.2vw, 0.9rem); font-weight: 700; padding: 6px 14px; border-radius: 999px; background: var(--blush-bg); color: var(--blush-text); }
 
-    .temp-row { display: flex; align-items: flex-end; justify-content: space-between; margin-top: clamp(2px, 0.8vh, 6px); }
+    .temp-row { display: flex; align-items: flex-end; justify-content: space-between; margin-top: 0; }
     .temp-display { font-size: clamp(3.2rem, 7.5vh, 6rem); font-weight: 800; color: var(--amber); line-height: 1; }
     .temp-emoji { font-size: clamp(2.4rem, 5.5vh, 4.4rem); }
     .temp-range { font-size: clamp(0.8rem, 1.3vw, 1rem); color: var(--muted); margin-top: clamp(3px, 0.8vh, 8px); font-weight: 700; }
@@ -133,13 +132,13 @@
 
     /* 股票指數卡片樣式：改成 2 欄小卡片，方便 8 項一次顯示完 */
     .stock-grid { display: grid; grid-template-columns: 1fr 1fr; gap: clamp(6px, 1.2vh, 10px) clamp(8px, 1.2vw, 12px); flex: 1; }
-    .stock-row { display: flex; flex-direction: column; gap: clamp(4px, 0.8vh, 6px); background: var(--cream); border-radius: 14px; padding: clamp(8px, 1.3vh, 12px) clamp(10px, 1.3vw, 14px); }
+    .stock-row { display: flex; flex-direction: column; gap: clamp(5px, 1vh, 8px); background: var(--cream); border-radius: 14px; padding: clamp(10px, 1.6vh, 14px) clamp(11px, 1.4vw, 15px); }
     .stock-top { display: flex; align-items: center; gap: 8px; }
-    .stock-badge { background: var(--teal); color: #fff; font-weight: 800; font-size: clamp(0.68rem, 1.05vw, 0.78rem); padding: clamp(3px, 0.6vh, 4px) clamp(7px, 1vw, 9px); border-radius: 8px; letter-spacing: 0.5px; }
-    .stock-name { font-size: clamp(0.72rem, 1.15vw, 0.85rem); font-weight: 700; color: #333; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .stock-badge { background: var(--teal); color: #fff; font-weight: 800; font-size: clamp(0.85rem, 1.4vw, 1rem); padding: clamp(4px, 0.8vh, 6px) clamp(8px, 1.2vw, 11px); border-radius: 8px; letter-spacing: 0.5px; }
+    .stock-name { font-size: clamp(0.95rem, 1.55vw, 1.15rem); font-weight: 700; color: #333; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     .stock-quote-row { display: flex; align-items: baseline; justify-content: space-between; gap: 6px; }
-    .stock-price { font-size: clamp(0.98rem, 1.7vw, 1.2rem); font-weight: 800; color: #333; }
-    .stock-change { font-size: clamp(0.68rem, 1.05vw, 0.78rem); font-weight: 800; border-radius: 7px; padding: 2px 6px; white-space: nowrap; }
+    .stock-price { font-size: clamp(1.3rem, 2.3vw, 1.6rem); font-weight: 800; color: #333; }
+    .stock-change { font-size: clamp(0.88rem, 1.4vw, 1.02rem); font-weight: 800; border-radius: 7px; padding: 3px 7px; white-space: nowrap; }
     .stock-change.up { color: #1f8f57; background: #e9f8f0; }
     .stock-change.down { color: #c0392b; background: #fdeceb; }
     .stock-change.flat { color: var(--muted); background: #eee; }
@@ -179,11 +178,9 @@
     <div class="card">
       <div class="card-title-row">
         <div class="card-title">☀️ 鴨脷洲 / 南區天氣與預報</div>
-        <div class="pill-tag">每時預報</div>
-      </div>
-
-      <div class="station-row">
-        <div class="condition-pill" id="weather-condition">載入中...</div>
+        <div style="display:flex; gap:8px; flex-wrap:wrap;">
+          <div class="condition-pill" id="weather-condition">載入中...</div>
+        </div>
       </div>
 
       <div class="temp-row">
@@ -220,7 +217,6 @@
     <div class="card">
       <div class="card-title-row">
         <div class="card-title">📈 主要指數</div>
-        <div class="pill-tag">即市報價</div>
       </div>
 
       <div class="stock-grid">
