@@ -144,7 +144,6 @@
     .stock-change.up { color: #1f8f57; background: #e9f8f0; }
     .stock-change.down { color: #c0392b; background: #fdeceb; }
     .stock-change.flat { color: var(--muted); background: #eee; }
-    .stock-market { font-size: clamp(0.6rem, 0.95vw, 0.68rem); color: var(--muted); }
 
     /* iPad 直向（portrait）時卡片改成上下排列，避免擠壓變形 */
     @media (max-width: 900px) {
@@ -233,7 +232,6 @@
             <span class="stock-price num" id="hsi-price">載入中</span>
             <span class="stock-change flat" id="hsi-change">--</span>
           </div>
-          <div class="stock-market" id="hsi-market">--</div>
         </div>
 
         <div class="stock-row">
@@ -242,7 +240,6 @@
             <span class="stock-price num" id="dji-price">載入中</span>
             <span class="stock-change flat" id="dji-change">--</span>
           </div>
-          <div class="stock-market" id="dji-market">--</div>
         </div>
 
         <div class="stock-row">
@@ -251,7 +248,6 @@
             <span class="stock-price num" id="ixic-price">載入中</span>
             <span class="stock-change flat" id="ixic-change">--</span>
           </div>
-          <div class="stock-market" id="ixic-market">--</div>
         </div>
 
         <div class="stock-row">
@@ -260,7 +256,6 @@
             <span class="stock-price num" id="gspc-price">載入中</span>
             <span class="stock-change flat" id="gspc-change">--</span>
           </div>
-          <div class="stock-market" id="gspc-market">--</div>
         </div>
 
         <div class="stock-row">
@@ -269,7 +264,6 @@
             <span class="stock-price num" id="rut-price">載入中</span>
             <span class="stock-change flat" id="rut-change">--</span>
           </div>
-          <div class="stock-market" id="rut-market">--</div>
         </div>
 
         <div class="stock-row">
@@ -278,7 +272,6 @@
             <span class="stock-price num" id="vix-price">載入中</span>
             <span class="stock-change flat" id="vix-change">--</span>
           </div>
-          <div class="stock-market" id="vix-market">--</div>
         </div>
 
         <div class="stock-row">
@@ -287,7 +280,6 @@
             <span class="stock-price num" id="gold-price">載入中</span>
             <span class="stock-change flat" id="gold-change">--</span>
           </div>
-          <div class="stock-market" id="gold-market">--</div>
         </div>
 
         <div class="stock-row">
@@ -296,7 +288,6 @@
             <span class="stock-price num" id="btc-price">載入中</span>
             <span class="stock-change flat" id="btc-change">--</span>
           </div>
-          <div class="stock-market" id="btc-market">--</div>
         </div>
       </div>
     </div>
@@ -442,16 +433,6 @@
       { symbol: 'BTC-USD', prefix: 'btc',  currency: '' }
     ];
 
-    function marketStateLabel(state) {
-      const map = {
-        PRE: '盤前', PREPRE: '盤前',
-        REGULAR: '開市中',
-        POST: '盤後', POSTPOST: '盤後',
-        CLOSED: '已收市'
-      };
-      return map[state] || '--';
-    }
-
     async function fetchOneStock({ symbol, prefix }) {
       const target = `https://query1.finance.yahoo.com/v8/finance/chart/${symbol}`;
       const proxied = `https://api.allorigins.win/raw?url=${encodeURIComponent(target)}`;
@@ -465,7 +446,6 @@
       const changePct = prevClose ? (change / prevClose) * 100 : 0;
 
       document.getElementById(`${prefix}-price`).innerText = price.toLocaleString('en-US', { maximumFractionDigits: 2 });
-      document.getElementById(`${prefix}-market`).innerText = marketStateLabel(meta.marketState);
 
       const dir = change > 0.005 ? 'up' : change < -0.005 ? 'down' : 'flat';
       const sign = change > 0 ? '+' : '';
@@ -491,7 +471,9 @@
         // 只有連續失敗才整批顯示錯誤，單次延遲不覆蓋原本正確的報價
         if (stockFailCount >= 2) {
           STOCK_LIST.forEach(({ prefix }) => {
-            document.getElementById(`${prefix}-market`).innerText = '連線失敗，重試中...';
+            const el = document.getElementById(`${prefix}-change`);
+            el.className = 'stock-change flat';
+            el.innerText = '連線失敗';
           });
         }
       }
